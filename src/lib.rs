@@ -8,14 +8,14 @@ mod tests;
 
 use scheme::SchemeState;
 
-pub enum Location {
-    // TODO: Naming of `MaybeUrl`
-    /// Current location is not yet a valid URL.
-    MaybeUrl,
-    /// Last advancement has reset the URL parser.
-    Reset,
+#[derive(Copy, Clone, Debug, PartialEq, Eq, Hash)]
+pub enum UrlLocation {
     /// Current location is the end of a valid URL.
     Url(u16, u16),
+    /// Current location is possibly a URL scheme.
+    Scheme,
+    /// Last advancement has reset the URL parser.
+    Reset,
 }
 
 #[derive(Copy, Clone, Debug, PartialEq, Eq, Hash)]
@@ -32,28 +32,27 @@ impl Default for State {
     }
 }
 
+#[repr(C)]
 #[derive(Copy, Clone, Debug, Default, PartialEq, Eq, Hash)]
-pub struct Locator {
-    state: State,
-
+pub struct UrlLocator {
     open_parentheses: u8,
     open_brackets: u8,
-    // TODO: Figure this shit out
-    open_quotes: u8,
 
     len_without_quote: Option<NonZeroU16>,
     illegal_end_chars: u16,
     len: u16,
+
+    state: State,
 }
 
-impl Locator {
+impl UrlLocator {
     #[inline]
     pub fn new() -> Self {
         Self::default()
     }
 
     #[inline]
-    pub fn advance(&mut self, c: char) -> Location {
+    pub fn advance(&mut self, c: char) -> UrlLocation {
         self.len += 1;
 
         match self.state {
@@ -64,26 +63,26 @@ impl Locator {
     }
 
     #[inline]
-    fn advance_scheme(&mut self, state: SchemeState, c: char) -> Location {
+    fn advance_scheme(&mut self, state: SchemeState, c: char) -> UrlLocation {
         self.state = match state.advance(c) {
             SchemeState::NONE => return self.reset(),
             SchemeState::COMPLETE => State::Separators(0),
             state => State::Scheme(state),
         };
 
-        Location::MaybeUrl
+        UrlLocation::Scheme
     }
 
     #[inline]
-    fn advance_separators(&mut self, count: u8, c: char) -> Location {
+    fn advance_separators(&mut self, count: u8, c: char) -> UrlLocation {
         match (c, count) {
             ('/', 0) => {
                 self.state = State::Separators(1);
-                Location::MaybeUrl
+                UrlLocation::Scheme
             },
             ('/', 1) => {
                 self.state = State::Separators(2);
-                Location::MaybeUrl
+                UrlLocation::Scheme
             },
             // Reset if there are more or less than two separators
             ('/', 2) | (_, 1) => self.reset(),
@@ -92,7 +91,7 @@ impl Locator {
     }
 
     #[inline]
-    fn advance_url(&mut self, c: char) -> Location {
+    fn advance_url(&mut self, c: char) -> UrlLocation {
         if Self::is_illegal_at_end(c) {
             self.illegal_end_chars += 1;
         } else {
@@ -103,7 +102,7 @@ impl Locator {
     }
 
     #[inline]
-    fn url(&mut self, c: char) -> Location {
+    fn url(&mut self, c: char) -> UrlLocation {
         match c {
             '(' => self.open_parentheses += 1,
             '[' => self.open_brackets += 1,
@@ -148,7 +147,7 @@ impl Locator {
             .len_without_quote
             .map(NonZeroU16::get)
             .unwrap_or(self.len - self.illegal_end_chars);
-        Location::Url(len, self.illegal_end_chars)
+        UrlLocation::Url(len, self.illegal_end_chars)
     }
 
     #[inline]
@@ -160,8 +159,8 @@ impl Locator {
     }
 
     #[inline]
-    fn reset(&mut self) -> Location {
+    fn reset(&mut self) -> UrlLocation {
         *self = Self::default();
-        Location::Reset
+        UrlLocation::Reset
     }
 }
