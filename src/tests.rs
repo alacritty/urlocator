@@ -2,16 +2,6 @@ use std::collections::HashMap;
 
 use crate::{UrlLocation, UrlLocator, SchemeState};
 
-// TODO: Can we somehow still do this?
-// #[test]
-// fn no_scheme_conflicts() {
-//     for scheme in &SCHEMES {
-//         for other_scheme in SCHEMES.iter().filter(|&s| s != scheme) {
-//             assert!(!scheme.ends_with(other_scheme),);
-//         }
-//     }
-// }
-
 #[test]
 fn advance_schemes() {
     let state = SchemeState::NONE;

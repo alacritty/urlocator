@@ -1,3 +1,76 @@
+//! # URL Locator
+//!
+//! This library provides a streaming parser for locating URLs.
+//!
+//! Instead of returning the URL itself, this library will only return the length of the URL and
+//! the offset from the current parsing position.
+//!
+//! The length and offset counts follow the example of Rust's standard library's [`char`] type and
+//! are based on unicode scalar values instead of graphemes.
+//!
+//! # Usage
+//!
+//! This crate is available on [crates.io](https://crates.io/crates/urlocator) and can be used by
+//! adding `urlocator` to your dependencies in your project's Cargo.toml:
+//!
+//! ```toml
+//! [dependencies]
+//! urlocator = "0.1.0"
+//! ```
+//!
+//! # Example: URL boundaries
+//!
+//! By keeping track of the current parser position, it is possible to locate the boundaries of a
+//! URL in a character stream:
+//!
+//! ```rust
+//! # use urlocator::{UrlLocator, UrlLocation};
+//! // Boundaries:      10-v                 v-28
+//! let input = "[example](https://example.org)";
+//!
+//! let mut locator = UrlLocator::new();
+//!
+//! let (mut start, mut end) = (0, 0);
+//!
+//! for (i, c) in input.chars().enumerate() {
+//!     if let UrlLocation::Url(length, end_offset) = locator.advance(c) {
+//!         start = 1 + i - length as usize;
+//!         end = i - end_offset as usize;
+//!     }
+//! }
+//!
+//! assert_eq!(start, 10);
+//! assert_eq!(end, 28);
+//! ```
+//!
+//! # Examlpe: Counting URLs
+//!
+//! By checking for the return state of the parser, it is possible to determine exactly when a URL
+//! has been broken. Using this, you can count the number of URLs in a stream:
+//!
+//! ```rust
+//! # use urlocator::{UrlLocator, UrlLocation};
+//! let input = "https://example.org/1 https://rust-lang.org/二 https://example.com/Ⅲ";
+//!
+//! let mut locator = UrlLocator::new();
+//!
+//! let mut url_count = 0;
+//! let mut reset = true;
+//!
+//! for c in input.chars() {
+//!     match locator.advance(c) {
+//!         UrlLocation::Url(_, _) if reset => {
+//!             url_count += 1;
+//!             reset = false;
+//!         }
+//!         UrlLocation::Reset => reset = true,
+//!         _ => (),
+//!     }
+//! }
+//!
+//! assert_eq!(url_count, 3);
+//! ```
+
 #![cfg_attr(all(test, feature = "bench"), feature(test))]
 
 use std::num::NonZeroU16;
@@ -8,6 +81,7 @@ mod tests;
 
 use scheme::SchemeState;
 
+/// Position of the URL parser.
 #[derive(Copy, Clone, Debug, PartialEq, Eq, Hash)]
 pub enum UrlLocation {
     /// Current location is the end of a valid URL.
@@ -18,10 +92,14 @@ pub enum UrlLocation {
     Reset,
 }
 
+/// URL parser positional state.
 #[derive(Copy, Clone, Debug, PartialEq, Eq, Hash)]
 enum State {
+    /// Parsing the URL scheme.
     Scheme(SchemeState),
+    /// Parsing optional path separators '//'.
     Separators(u8),
+    /// Parsing a valid URL.
     Url,
 }
 
@@ -32,6 +110,7 @@ impl Default for State {
     }
 }
 
+/// URL parser.
 #[repr(C)]
 #[derive(Copy, Clone, Debug, Default, PartialEq, Eq, Hash)]
 pub struct UrlLocator {
@@ -46,11 +125,24 @@ pub struct UrlLocator {
 }
 
 impl UrlLocator {
+    /// Create a new parser.
     #[inline]
     pub fn new() -> Self {
         Self::default()
     }
 
+    /// Advance the parser by one char.
+    ///
+    /// # Example
+    ///
+    /// ```rust
+    /// # use urlocator::{UrlLocator, UrlLocation};
+    /// let mut locator = UrlLocator::new();
+    ///
+    /// let location = locator.advance('h');
+    ///
+    /// assert_eq!(location, UrlLocation::Scheme);
+    /// ```
     #[inline]
     pub fn advance(&mut self, c: char) -> UrlLocation {
         self.len += 1;
