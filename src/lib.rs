@@ -59,10 +59,10 @@
 //!
 //! for c in input.chars() {
 //!     match locator.advance(c) {
-//!         UrlLocation::Url(_, _) if reset => {
+//!         UrlLocation::Url(..) if reset => {
 //!             url_count += 1;
 //!             reset = false;
-//!         }
+//!         },
 //!         UrlLocation::Reset => reset = true,
 //!         _ => (),
 //!     }

@@ -1,6 +1,6 @@
 use std::collections::HashMap;
 
-use crate::{UrlLocation, UrlLocator, SchemeState};
+use crate::{SchemeState, UrlLocation, UrlLocator};
 
 #[test]
 fn advance_schemes() {
