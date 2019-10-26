@@ -71,9 +71,10 @@
 //! assert_eq!(url_count, 3);
 //! ```
 
+#![cfg_attr(not(test), no_std)]
 #![cfg_attr(all(test, feature = "bench"), feature(test))]
 
-use std::num::NonZeroU16;
+use core::num::NonZeroU16;
 
 mod scheme;
 #[cfg(test)]
