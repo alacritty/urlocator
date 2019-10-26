@@ -107,7 +107,7 @@ enum State {
 impl Default for State {
     #[inline]
     fn default() -> Self {
-        Self::Scheme(SchemeState::default())
+        State::Scheme(SchemeState::default())
     }
 }
 
