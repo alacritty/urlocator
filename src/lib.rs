@@ -15,7 +15,7 @@
 //!
 //! ```toml
 //! [dependencies]
-//! urlocator = "0.1.0"
+//! urlocator = "0.1.1"
 //! ```
 //!
 //! # Example: URL boundaries
