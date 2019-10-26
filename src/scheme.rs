@@ -13,7 +13,7 @@ macro_rules! schemes {
         impl Default for $name {
             #[inline]
             fn default() -> Self {
-                Self::NONE
+                $name::NONE
             }
         }
 
@@ -21,9 +21,9 @@ macro_rules! schemes {
             #[inline]
             pub fn advance(self, c: char) -> Self {
                 match (self, c) {
-                    $($((Self::$state, $match))|+ => Self::$result,)*
-                    $((Self::$complete, ':') => Self::COMPLETE,)*
-                    _ => Self::NONE,
+                    $($(($name::$state, $match))|+ => $name::$result,)*
+                    $(($name::$complete, ':') => $name::COMPLETE,)*
+                    _ => $name::NONE,
                 }
             }
         }

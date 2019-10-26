@@ -9,7 +9,7 @@ os:
   - windows
 
 rust:
-  - 1.38.0
+  - 1.36.0
   - stable
   - nightly
 
