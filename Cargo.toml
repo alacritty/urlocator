@@ -13,4 +13,4 @@ version = "0.1.1"
 edition = "2018"
 
 [features]
-bench = []
+nightly = []

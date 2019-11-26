@@ -27,6 +27,7 @@ fn boundaries() {
     assert_eq!(position("before https://example.org after"), (7, 6));
     assert_eq!(position("before https://example.org"), (7, 0));
     assert_eq!(position("https://example.org after"), (0, 6));
+    assert_eq!(position("https://example.org/test'ing;"), (0, 5));
 }
 
 #[test]
@@ -186,7 +187,7 @@ fn position(input: &str) -> (usize, usize) {
     url.map(|(end, len)| (end - len, input.len() - end)).unwrap()
 }
 
-#[cfg(feature = "bench")]
+#[cfg(all(test, feature = "nightly"))]
 mod bench {
     extern crate test;
 

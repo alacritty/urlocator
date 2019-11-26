@@ -71,8 +71,8 @@
 //! assert_eq!(url_count, 3);
 //! ```
 
-#![cfg_attr(not(test), no_std)]
-#![cfg_attr(all(test, feature = "bench"), feature(test))]
+#![cfg_attr(all(test, feature = "nightly"), feature(test))]
+// #![cfg_attr(not(test), no_std)]
 
 use core::num::NonZeroU16;
 
@@ -236,11 +236,14 @@ impl UrlLocator {
         }
 
         self.state = State::Url;
-        let len = self
-            .len_without_quote
-            .map(NonZeroU16::get)
-            .unwrap_or(self.len - self.illegal_end_chars);
-        UrlLocation::Url(len, self.illegal_end_chars)
+
+        let (len, end_offset) = if let Some(len) = self.len_without_quote {
+            (len.get(), self.len - len.get())
+        } else {
+            (self.len - self.illegal_end_chars, self.illegal_end_chars)
+        };
+
+        UrlLocation::Url(len, end_offset)
     }
 
     #[inline]
