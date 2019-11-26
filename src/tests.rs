@@ -124,6 +124,15 @@ fn markdown() {
 }
 
 #[test]
+fn file() {
+    assert_eq!(max_len("file:///test.rs:13:9"), Some(20));
+    assert_eq!(max_len("file:///test"), Some(12));
+    assert_eq!(max_len("file://test"), Some(11));
+    assert_eq!(max_len("file:/test"), Some(10));
+    assert_eq!(max_len("file:test"), Some(9));
+}
+
+#[test]
 fn multiple_urls() {
     let input = "https://example.org https://example.com/test";
     let mut result_map = HashMap::new();
@@ -139,8 +148,8 @@ fn parser_states() {
     let mut result_map = HashMap::new();
     result_map.insert(0, UrlLocation::Reset);
     result_map.insert(3, UrlLocation::Scheme);
-    result_map.insert(10, UrlLocation::Scheme);
-    result_map.insert(11, UrlLocation::Url(9, 0));
+    result_map.insert(8, UrlLocation::Scheme);
+    result_map.insert(9, UrlLocation::Url(7, 0));
     result_map.insert(21, UrlLocation::Url(19, 0));
     result_map.insert(22, UrlLocation::Reset);
     result_map.insert(24, UrlLocation::Reset);

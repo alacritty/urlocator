@@ -98,8 +98,6 @@ pub enum UrlLocation {
 enum State {
     /// Parsing the URL scheme.
     Scheme(SchemeState),
-    /// Parsing optional path separators '//'.
-    Separators(u8),
     /// Parsing a valid URL.
     Url,
 }
@@ -112,17 +110,16 @@ impl Default for State {
 }
 
 /// URL parser.
-#[repr(C)]
 #[derive(Copy, Clone, Debug, Default, PartialEq, Eq, Hash)]
 pub struct UrlLocator {
-    open_parentheses: u8,
-    open_brackets: u8,
+    state: State,
 
     len_without_quote: Option<NonZeroU16>,
     illegal_end_chars: u16,
     len: u16,
 
-    state: State,
+    open_parentheses: u8,
+    open_brackets: u8,
 }
 
 impl UrlLocator {
@@ -150,7 +147,6 @@ impl UrlLocator {
 
         match self.state {
             State::Scheme(state) => self.advance_scheme(state, c),
-            State::Separators(count) => self.advance_separators(count, c),
             State::Url => self.advance_url(c),
         }
     }
@@ -159,28 +155,11 @@ impl UrlLocator {
     fn advance_scheme(&mut self, state: SchemeState, c: char) -> UrlLocation {
         self.state = match state.advance(c) {
             SchemeState::NONE => return self.reset(),
-            SchemeState::COMPLETE => State::Separators(0),
+            SchemeState::COMPLETE => State::Url,
             state => State::Scheme(state),
         };
 
         UrlLocation::Scheme
-    }
-
-    #[inline]
-    fn advance_separators(&mut self, count: u8, c: char) -> UrlLocation {
-        match (c, count) {
-            ('/', 0) => {
-                self.state = State::Separators(1);
-                UrlLocation::Scheme
-            },
-            ('/', 1) => {
-                self.state = State::Separators(2);
-                UrlLocation::Scheme
-            },
-            // Reset if there are more or less than two separators
-            ('/', 2) | (_, 1) => self.reset(),
-            _ => self.url(c),
-        }
     }
 
     #[inline]
