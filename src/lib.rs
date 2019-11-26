@@ -72,7 +72,7 @@
 //! ```
 
 #![cfg_attr(all(test, feature = "nightly"), feature(test))]
-// #![cfg_attr(not(test), no_std)]
+#![cfg_attr(not(test), no_std)]
 
 use core::num::NonZeroU16;
 
