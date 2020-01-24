@@ -27,11 +27,11 @@ fn boundaries() {
     assert_eq!(position("before https://example.org after"), (7, 6));
     assert_eq!(position("before https://example.org"), (7, 0));
     assert_eq!(position("https://example.org after"), (0, 6));
-    assert_eq!(position("https://example.org/test'ing;"), (0, 5));
+    assert_eq!(position("https://example.org/test'ing;"), (0, 1));
 }
 
 #[test]
-fn start() {
+fn exclude_end() {
     assert_eq!(max_len("https://example.org/test\u{00}ing"), Some(24));
     assert_eq!(max_len("https://example.org/test\u{1F}ing"), Some(24));
     assert_eq!(max_len("https://example.org/test\u{7F}ing"), Some(24));
@@ -44,7 +44,7 @@ fn start() {
 }
 
 #[test]
-fn end() {
+fn exclude_start() {
     assert_eq!(max_len("complicated:https://example.org"), Some(19));
     assert_eq!(max_len("\u{2502}https://example.org"), Some(19));
     assert_eq!(max_len("test.https://example.org"), Some(19));
@@ -88,10 +88,10 @@ fn url_matching_chars() {
     assert_eq!(max_len("https://example.org/]()"), Some(20));
     assert_eq!(max_len("[https://example.org]"), Some(19));
 
-    assert_eq!(max_len("'https://example.org/test'ing''"), Some(29));
-    assert_eq!(max_len("https://example.org/test'ing'"), Some(29));
+    assert_eq!(max_len("https://example.org/tester's_dream"), Some(34));
+    assert_eq!(max_len("'https://example.org/test'ing'/'"), Some(30));
+    assert_eq!(max_len("https://example.org/test'ing'/"), Some(30));
     assert_eq!(max_len("'https://example.org'"), Some(19));
-    assert_eq!(max_len("https://example.org'"), Some(19));
 
     assert_eq!(max_len("\"https://example.org\""), Some(19));
     assert_eq!(max_len("\"https://example.org"), Some(19));
