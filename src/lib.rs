@@ -74,8 +74,6 @@
 #![cfg_attr(all(test, feature = "nightly"), feature(test))]
 #![cfg_attr(not(test), no_std)]
 
-use core::num::NonZeroU16;
-
 mod scheme;
 #[cfg(test)]
 mod tests;
@@ -114,7 +112,6 @@ impl Default for State {
 pub struct UrlLocator {
     state: State,
 
-    len_without_quote: Option<NonZeroU16>,
     illegal_end_chars: u16,
     len: u16,
 
@@ -192,12 +189,6 @@ impl UrlLocator {
                     self.open_brackets -= 1;
                 }
             },
-            '\'' => {
-                self.len_without_quote = match self.len_without_quote {
-                    Some(_) => None,
-                    None => NonZeroU16::new(self.len - self.illegal_end_chars - 1),
-                }
-            },
             // Illegal URL characters
             '\u{00}'..='\u{1F}'
             | '\u{7F}'..='\u{9F}'
@@ -216,19 +207,13 @@ impl UrlLocator {
 
         self.state = State::Url;
 
-        let (len, end_offset) = if let Some(len) = self.len_without_quote {
-            (len.get(), self.len - len.get())
-        } else {
-            (self.len - self.illegal_end_chars, self.illegal_end_chars)
-        };
-
-        UrlLocation::Url(len, end_offset)
+        UrlLocation::Url(self.len - self.illegal_end_chars, self.illegal_end_chars)
     }
 
     #[inline]
     fn is_illegal_at_end(c: char) -> bool {
         match c {
-            '.' | ',' | ':' | ';' | '?' | '!' | '(' | '[' => true,
+            '.' | ',' | ':' | ';' | '?' | '!' | '(' | '[' | '\'' => true,
             _ => false,
         }
     }
