@@ -1,6 +1,6 @@
 [package]
 authors = ["Christian Duerr <contact@christianduerr.com>"]
-repository = "https://github.com/chrisduerr/urlocator.git"
+repository = "https://github.com/alacritty/urlocator.git"
 description = "Locate URLs in character streams"
 documentation = "https://docs.rs/urlocator"
 keywords = ["stream", "url", "parser"]
