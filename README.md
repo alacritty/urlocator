@@ -15,7 +15,7 @@ adding `urlocator` to your dependencies in your project's Cargo.toml:
 
 ```toml
 [dependencies]
-urlocator = "0.1.1"
+urlocator = "0.1.3"
 ```
 
 ### Example: URL boundaries
