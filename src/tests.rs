@@ -4,8 +4,15 @@ use crate::{SchemeState, UrlLocation, UrlLocator};
 
 #[test]
 fn advance_schemes() {
-    let state = SchemeState::NONE;
-    assert_eq!(state, SchemeState::NONE);
+    let state = SchemeState::RESET;
+
+    let state = state.advance('h');
+    assert_eq!(state, SchemeState::H);
+    let state = state.advance('x');
+    assert_eq!(state, SchemeState::INVALID);
+    let state = state.advance(' ');
+    assert_eq!(state, SchemeState::RESET);
+
     let state = state.advance('h');
     assert_eq!(state, SchemeState::H);
     let state = state.advance('t');
@@ -63,6 +70,7 @@ fn url_unicode() {
 #[test]
 fn url_schemes() {
     assert_eq!(max_len("invalidscheme://example.org"), None);
+    assert_eq!(max_len("makefile://example.org"), None);
     assert_eq!(max_len("mailto://example.org"), Some(20));
     assert_eq!(max_len("https://example.org"), Some(19));
     assert_eq!(max_len("http://example.org"), Some(18));
@@ -152,9 +160,8 @@ fn parser_states() {
     result_map.insert(9, UrlLocation::Url(7, 0));
     result_map.insert(21, UrlLocation::Url(19, 0));
     result_map.insert(22, UrlLocation::Reset);
-    result_map.insert(24, UrlLocation::Reset);
-    result_map.insert(25, UrlLocation::Scheme);
-    result_map.insert(26, UrlLocation::Reset);
+    result_map.insert(24, UrlLocation::Scheme);
+    result_map.insert(27, UrlLocation::Reset);
     exact_url_match(input, result_map);
 }
 
