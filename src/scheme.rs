@@ -7,13 +7,14 @@ macro_rules! schemes {
         pub enum $name {
             $($result,)*
             COMPLETE,
-            NONE,
+            INVALID,
+            RESET,
         }
 
         impl Default for $name {
             #[inline]
             fn default() -> Self {
-                $name::NONE
+                $name::RESET
             }
         }
 
@@ -23,7 +24,8 @@ macro_rules! schemes {
                 match (self, c) {
                     $($(($name::$state, $match))|+ => $name::$result,)*
                     $(($name::$complete, ':') => $name::COMPLETE,)*
-                    _ => $name::NONE,
+                    (_, 'a'..='z') | (_, 'A'..='Z') => $name::INVALID,
+                    _ => $name::RESET,
                 }
             }
         }
@@ -32,31 +34,31 @@ macro_rules! schemes {
 
 schemes! {
     SchemeState {
-        [NONE, 'h'|'H' => H],
+        [RESET, 'h'|'H' => H],
         [H, 't'|'T' => HT],
         [HT, 't'|'T' => HTT],
         [HTT, 'p'|'P' => HTTP],
         [HTTP, 's'|'S' => HTTPS],
-        [NONE, 'f'|'F' => F],
+        [RESET, 'f'|'F' => F],
         [F, 't'|'T' => FT],
         [FT, 'p'|'P' => FTP],
         [F, 'i'|'I' => FI],
         [FI, 'l'|'L' => FIL],
         [FIL, 'e'|'E' => FILE],
-        [NONE, 'm'|'M' => M],
+        [RESET, 'm'|'M' => M],
         [M, 'a'|'A' => MA],
         [MA, 'i'|'I' => MAI],
         [MAI, 'l'|'L' => MAIL],
         [MAIL, 't'|'T' => MAILT],
         [MAILT, 'o'|'O' => MAILTO],
-        [NONE, 'n'|'N' => N],
+        [RESET, 'n'|'N' => N],
         [N, 'e'|'E' => NE],
         [NE, 'w'|'W' => NEW],
         [NEW, 's'|'S' => NEWS],
-        [NONE, 'g'|'G' => G],
+        [RESET, 'g'|'G' => G],
         [G, 'i'|'I' => GI],
         [GI, 't'|'T' => GIT],
-        [NONE, 's'|'S' => S],
+        [RESET, 's'|'S' => S],
         [S, 's'|'S' => SS],
         [SS, 'h'|'H' => SSH],
     }

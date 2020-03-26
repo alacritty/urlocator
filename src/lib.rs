@@ -151,7 +151,7 @@ impl UrlLocator {
     #[inline]
     fn advance_scheme(&mut self, state: SchemeState, c: char) -> UrlLocation {
         self.state = match state.advance(c) {
-            SchemeState::NONE => return self.reset(),
+            SchemeState::RESET => return self.reset(),
             SchemeState::COMPLETE => State::Url,
             state => State::Scheme(state),
         };
