@@ -58,10 +58,15 @@ schemes! {
         [RESET, 'g'|'G' => G],
         [G, 'i'|'I' => GI],
         [GI, 't'|'T' => GIT],
+        [G, 'o'|'O' => GO],
+        [GO, 'p'|'P' => GOP],
+        [GOP, 'h'|'H' => GOPH],
+        [GOPH, 'e'|'E' => GOPHE],
+        [GOPHE, 'r'|'R' => GOPHER],
         [RESET, 's'|'S' => S],
         [S, 's'|'S' => SS],
         [SS, 'h'|'H' => SSH],
     }
 
-    [HTTP, HTTPS, FTP, FILE, MAILTO, NEWS, GIT, SSH]
+    [HTTP, HTTPS, FTP, FILE, MAILTO, NEWS, GIT, GOPHER, SSH]
 }
