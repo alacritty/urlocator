@@ -72,6 +72,7 @@ fn url_schemes() {
     assert_eq!(max_len("invalidscheme://example.org"), None);
     assert_eq!(max_len("makefile://example.org"), None);
     assert_eq!(max_len("mailto://example.org"), Some(20));
+    assert_eq!(max_len("gemini://example.org"), Some(20));
     assert_eq!(max_len("gopher://example.org"), Some(20));
     assert_eq!(max_len("https://example.org"), Some(19));
     assert_eq!(max_len("http://example.org"), Some(18));
