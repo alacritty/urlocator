@@ -56,6 +56,11 @@ schemes! {
         [NE, 'w'|'W' => NEW],
         [NEW, 's'|'S' => NEWS],
         [RESET, 'g'|'G' => G],
+        [G, 'e'|'E' => GE],
+        [GE, 'm'|'M' => GEM],
+        [GEM, 'i'|'I' => GEMI],
+        [GEMI, 'n'|'N' => GEMIN],
+        [GEMIN, 'i'|'I' => GEMINI],
         [G, 'i'|'I' => GI],
         [GI, 't'|'T' => GIT],
         [G, 'o'|'O' => GO],
@@ -68,5 +73,5 @@ schemes! {
         [SS, 'h'|'H' => SSH],
     }
 
-    [HTTP, HTTPS, FTP, FILE, MAILTO, NEWS, GIT, GOPHER, SSH]
+    [HTTP, HTTPS, FTP, FILE, MAILTO, NEWS, GEMINI, GIT, GOPHER, SSH]
 }
