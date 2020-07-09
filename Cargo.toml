@@ -9,7 +9,7 @@ exclude = ["/.travis.yml"]
 license = "MIT/Apache-2.0"
 readme = "README.md"
 name = "urlocator"
-version = "0.1.3"
+version = "0.1.4"
 edition = "2018"
 
 [features]
