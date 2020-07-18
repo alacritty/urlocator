@@ -8,6 +8,6 @@ tasks:
   - rustfmt: |
       cd urlocator
       $HOME/.cargo/bin/cargo fmt -- --check
-  - rustfmt: |
+  - clippy: |
       cd urlocator
       $HOME/.cargo/bin/cargo clippy
