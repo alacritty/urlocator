@@ -3,11 +3,18 @@ sources:
   - https://github.com/alacritty/urlocator
 tasks:
   - rustup: |
-      curl https://sh.rustup.rs -sSf | sh -s -- -y --default-toolchain stable --profile minimal
+      curl https://sh.rustup.rs -sSf | sh -s -- -y --default-toolchain stable --profile minimal -c clippy
+  - stable: |
+      cd urlocator
+      $HOME/.cargo/bin/cargo +stable test
+  - clippy: |
+      cd urlocator
+      $HOME/.cargo/bin/cargo +stable clippy
+  - rustfmt: |
+      $HOME/.cargo/bin/rustup toolchain install nightly -c rustfmt
+      cd urlocator
+      $HOME/.cargo/bin/cargo +nightly fmt -- --check
   - 1-36-0: |
       $HOME/.cargo/bin/rustup toolchain install --profile minimal 1.36.0
       cd urlocator
       $HOME/.cargo/bin/cargo +1.36.0 test
-  - stable: |
-      cd urlocator
-      $HOME/.cargo/bin/cargo +stable test
